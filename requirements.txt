@@ -15,15 +15,20 @@ datasets==2.21.0
 # Stufe 2 (prepare-02.py): Sampling, Train-/Test-Split und Speichern als Parquet.
 # (pandas und pyarrow werden zwar von datasets mitinstalliert, sind hier aber
 # als direkte Abhaengigkeiten aufgefuehrt.)
-pandas
-pyarrow
+pandas==3.0.3
+pyarrow==25.0.0
 
 # Stufe 3 (Modelltraining): TF-IDF-Vektorisierung, Klassifikator
 # sowie Accuracy und Konfusionsmatrix.
-scikit-learn
+scikit-learn==1.9.0
 
 # Stufe 3 (Vorverarbeitung): Stemming der Tokens (SnowballStemmer).
-nltk
+nltk==3.10.0
 
 # Stufe 4 (Evaluation): Darstellung der Konfusionsmatrix als Abbildung.
-matplotlib
+matplotlib==3.11.1
+
+# Stufe 3/4/5: Speichern und Laden der trainierten Modelle (train-*.py,
+# predict-05.py). Wird von scikit-learn mitinstalliert, hier aber als direkte
+# Abhaengigkeit aufgefuehrt, da es direkt importiert wird.
+joblib==1.5.3
