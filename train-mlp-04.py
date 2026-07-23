@@ -1,19 +1,19 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 import numpy as np
-from nltk.stem import SnowballStemmer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
-import re
-from sklearn.naive_bayes import ComplementNB
+import joblib
+from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import f1_score
 from sklearn.metrics import classification_report
 
 from config import (
     CATEGORIES, DATASET, DATA_DIR, PROCESSED_DIR,
     SAMPLE_SIZE, TEST_SIZE, SEED,
+    stem_tokens, MODELS_DIR, VECTORIZER_FILE, MLP_MODEL_FILE,
 )
 
 TRAIN_FILE = PROCESSED_DIR / "train.parquet"
@@ -21,13 +21,6 @@ TEST_FILE  = PROCESSED_DIR / "test.parquet"
 
 def main():
     print("")
-
-    stemmer = SnowballStemmer("english")
-    _token_pattern = re.compile(r"(?u)\b\w\w+\b")   # Wörter aus mind. 2 Zeichen
-
-    def stem_tokens(text):
-        """Zerlegt den Text in Wörter und stemmt jedes einzelne."""
-        return [stemmer.stem(tok) for tok in  _token_pattern.findall(text)]
 
     # TRAIN
     df_train = pd.read_parquet(TRAIN_FILE)
@@ -62,7 +55,12 @@ def main():
     y = df_train["rating"]
     print(vectorizer.get_feature_names_out())
 
-    model = ComplementNB(alpha=0.5)
+    model = MLPClassifier(hidden_layer_sizes=(8,), early_stopping=True, 
+                          verbose=True,
+                          max_iter=40,
+                          batch_size=512,
+                          random_state=SEED,
+                          validation_fraction=0.1)
     model.fit(X, y)
 
     X_test = vectorizer.transform(corpus_test)   # transform, NICHT fit_transform!
@@ -83,6 +81,12 @@ def main():
     # Verwirrungsmatrix (5x5)
     cm = confusion_matrix(y_test, y_pred, labels=[1, 2, 3, 4, 5])
     print(cm)
+
+    # --- Modell speichern (fuer predict-05.py) ---
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    joblib.dump(vectorizer, VECTORIZER_FILE)
+    joblib.dump(model, MLP_MODEL_FILE)
+    print(f"Gespeichert: {VECTORIZER_FILE} und {MLP_MODEL_FILE}")
     
     disp = ConfusionMatrixDisplay.from_predictions(
     y_test, y_pred, labels=[1, 2, 3, 4, 5], cmap="Blues")
