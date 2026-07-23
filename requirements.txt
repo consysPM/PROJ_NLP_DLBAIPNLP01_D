@@ -1,0 +1,29 @@
+# ---------------------------------------------------------------------------
+# Projektbericht DLBAIPNLP01_D - Sentimentanalyse von Produktrezensionen
+# Python-Abhaengigkeiten
+#
+# Installation:  pip install -r requirements.txt
+# (empfohlen in einer virtuellen Umgebung, z. B. python -m venv .venv)
+# ---------------------------------------------------------------------------
+
+# Stufe 1 (download-01.py): Laden des Amazon Reviews'23 Datensatzes.
+# Der Datensatz wird ueber ein Ladeskript bereitgestellt und benoetigt daher
+# load_dataset(..., trust_remote_code=True). Ab datasets 4.0 wurde diese
+# Funktion entfernt; deshalb wird bewusst eine 2.x-Version verwendet.
+datasets==2.21.0
+
+# Stufe 2 (prepare-02.py): Sampling, Train-/Test-Split und Speichern als Parquet.
+# (pandas und pyarrow werden zwar von datasets mitinstalliert, sind hier aber
+# als direkte Abhaengigkeiten aufgefuehrt.)
+pandas
+pyarrow
+
+# Stufe 3 (Modelltraining): TF-IDF-Vektorisierung, Klassifikator
+# sowie Accuracy und Konfusionsmatrix.
+scikit-learn
+
+# Stufe 3 (Vorverarbeitung): Stemming der Tokens (SnowballStemmer).
+nltk
+
+# Stufe 4 (Evaluation): Darstellung der Konfusionsmatrix als Abbildung.
+matplotlib
